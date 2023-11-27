@@ -1,15 +1,6 @@
 import clip
 import torch
-
-from numpy import ndarray
-from typing import List
 from PIL import Image
-
-import os
-from chromadb import Client, Settings
-from typing import List
-
-from caption_predictor import get_caption_prediction_from_embeddings, get_caption_prediction_from_image
 
 
 class DirectionalClipTransformEmbeddingFunction:
