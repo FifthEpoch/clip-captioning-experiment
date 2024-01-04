@@ -34,13 +34,14 @@ def get_device(device_id: int) -> D:
     if not torch.cuda.is_available():
         return CPU
     device_id = min(torch.cuda.device_count() - 1, device_id)
-    return torch.device(f'cuda:{device_id}')
+    #return torch.device(f'cuda:{device_id}')
+    return torch.device('cuda:0')
 
 
 class CaptionPredictor:
 
-    def __init__(self, model_name: str = "ViT-B/32", device: str = "cpu"):
-        self.device = device  # Store the specified device for model execution
+    def __init__(self, model_name: str = "ViT-B/32", device: str = "cuda"):
+        self.device = 'cuda:0'  # Store the specified device for model execution
         self.model, self.preprocess = clip.load(model_name, self.device)
 
     def generate2(self,
@@ -125,6 +126,9 @@ class CaptionPredictor:
             #     prefix_embed = model.forward_image(image)
             # else:
             prefix_embed = model.clip_project(_emd).reshape(1, _prefix_length, -1)
+
+        print(f'\nprefix_embed.shape: {prefix_embed.shape}\n')
+
         if use_beam_search:
             return self.generate_beam(model, tokenizer, embed=prefix_embed)[0]
         else:
@@ -157,6 +161,9 @@ class CaptionPredictor:
             # else:
             prefix = clip_model.encode_image(image).to(device, dtype=torch.float32)
             prefix_embed = model.clip_project(prefix).reshape(1, _prefix_length, -1)
+
+            print(f'prefix_embed.shape: {prefix_embed.shape}')
+
         if use_beam_search:
             return self.generate_beam(model, tokenizer, embed=prefix_embed)[0]
         else:
@@ -276,9 +283,6 @@ class ClipCaptionPrefix(ClipCaptionModel):
         super(ClipCaptionPrefix, self).train(mode)
         self.gpt.eval()
         return self
-
-
-
 
 
 
